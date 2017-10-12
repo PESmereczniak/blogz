@@ -1,0 +1,23 @@
+links{
+  position: sticky;
+  padding: 2px;
+  color: white;
+  background: green;
+  
+}
+
+.blogpost{
+  background-color: rgba(72, 150, 139, 0.418);
+}
+
+.newblogpost{
+  background: rgba(42, 184, 165, 0.521);
+}
+
+#enternew{
+  background: rgb(110, 202, 224);
+}
+
+h1{
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif
+}

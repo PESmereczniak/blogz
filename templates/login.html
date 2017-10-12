@@ -1,8 +1,17 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Log in to Get It Done!</h1>
+<h1>Log in to Post!</h1>
 <p>If you don't have an account, you may <a href="/register">register</a> for one</p>
+
+{% with messages = get_flashed_messages(with_categories=True) %}
+<ul>
+  {% for category,message in messages %}
+    <li class="{{category}}">{{message}}</li>
+  {% endfor %}
+</ul>
+{% endwith %}
+
 <form action="/login" method="post">
     <table>
         <tr>
