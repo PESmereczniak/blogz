@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+
+<div class="newblogpost" name='{{thisblog.id}}'>
+  <h4>{{thisblog.blog_title}}</h4>
+  <p>{{thisblog.blog_text}}</p>
+</div>
+
+
+{% endblock %}

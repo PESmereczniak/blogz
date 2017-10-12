@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{{title}}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styling.css') }}">
+  </head>
+
+  <body>
+    <div id='links'>
+      <a class="navlink" href='/'>Home</a>
+      <a class="navlink" href='/blog'>Read Blog</a>
+      <a class="navlink" href='/newpost'>New Post</a>
+    </div>
+
+    <h1>{{title}}</h1></br>
+    <p>Welcome to the blog!</p>
+    <p>Please follow the links above!</p>
+
+    {% block content %}
+
+    {% endblock %}
+
+  </body>
+</html>

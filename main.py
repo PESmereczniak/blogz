@@ -19,6 +19,77 @@ class Blog(db.Model):
         self.blog_title = blog_title
         self.blog_text = blog_text
 
+#THIS IS THE USER FROM GET-IT-DONE; ADDED 10/12
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(40), unique=True)
+    password = db.Column(db.String(20))
+    tasks = db.relationship('Task', backref='owner')
+
+    def __init__(self, email, password):
+        self.email = email
+        self.password = password
+
+#THIS IS THE USER-VERIFICATION FROM GET-IT-DONE; ADDED 10/12
+@app.before_request
+def require_login():
+  allowed_routs = ['login', 'register']
+  if request.endpoingt not in allowed_routs and 'email' not in session:
+    return redirect('/login')
+
+#THIS IS THE LOGIN FROM GET-IT-DONE; ADDED 10/12
+@app.route('/login', methods=['POST', 'GET'])
+def login():
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+        user = User.query.filter_by(email=email).first()
+        if user and user.password == password:
+            session['email'] = email
+            flash("Logged In")
+            return redirect('/')
+        else:
+            flash('User password incorrect, or user does not exist', 'error')
+
+    return render_template('login.html')
+
+#THIS IS THE LOGIN FROM GET-IT-DONE; ADDED 10/12
+@app.route('/register', methods=['POST', 'GET'])
+def register():
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+        verify = request.form['verify']
+
+        #TODO - validate user's entered DATA - ADDED 10/10/17 - FLASH ERRORS, KEEPS EMAIL
+        if len(password) <= 2 or len(password) >= 21 or ' ' in password:
+            flash('Password must be at least eight (3) characters long and CANNOT contain spaces.', 'error')
+            return render_template('register.html', email=email)
+
+        if password != verify:
+            flash('Passwords MUST match.  Please re-enter.', 'error')
+            return render_template('register.html', email=email)
+
+        existing_user = User.query.filter_by(email=email).first()
+
+        if not existing_user:
+            new_user = User(email, password)
+            db.session.add(new_user)
+            db.session.commit()
+            session['email'] = email
+            return redirect('/')
+        else:
+            flash('User name already exists', 'error')
+            return redirect('/register')
+
+    return render_template('register.html')
+
+#LOGOUT FROM GET-IT-DONE 10-12
+@app.route('/logout')
+def logout():
+    del session['email']
+    return redirect('/')
+
 @app.route('/newpost', methods=['POST', 'GET'])
 def make_newpost():
     return render_template('newpost.html', title="Create New Post")
@@ -58,6 +129,17 @@ def blog():
 @app.route('/', methods=['POST', 'GET'])
 def index():
     return render_template('base.html',title="Build-a-Blog")
+
+#DELETE ENTRY (TASK) FROM GET-IT-DONE 10-12
+@app.route('/delete-task', methods=['POST'])
+def delete_task():
+    task_id = int(request.form['task-id'])
+    task = Task.query.get(task_id)
+    task.completed = True
+    db.session.add(task)
+    db.session.commit()
+
+    return redirect('/')
 
 if __name__ == '__main__':
     app.run()
