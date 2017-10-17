@@ -147,10 +147,6 @@ def user_index():
 
     return render_template('blog.html',title="My Blogs", blogs=blogs, owner=owner)
 
-#THIS WILL RENDER A PAGE OF ALL CONTRIBUTERS, THEIR NAME/EMAIL WILL LINK TO THEIR HOME PAGE
-@app.route('/users', methods=['POST', 'GET'])
-
-
 #DELETE ENTRY (TASK) FROM GET-IT-DONE 10-12
 #DELETING ENTRY FAILS ALL CHECKS - WILL NOT DELETE; WILL NOT REROUTE/RENDER, ETC
 @app.route('/deleteblog', methods=['POST', 'GET'])
