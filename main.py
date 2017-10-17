@@ -127,8 +127,10 @@ def blog():
         return render_template('indblog.html',title=thisblog.blog_title,thisblog=thisblog)
 
     if theuser: #FOR SHOWING LIST OF ONE USER'S BLOG ENTRIES
-        user = User.query.filter_by(email=theuser).all()
-        return render_template('userblog.html',user=user,blogs=blogs)
+        owner = User.query.filter_by(email=theuser).first()
+        blogs = Blog.query.filter_by(owner=owner).all()
+
+        return render_template('blog.html',title=theuser, blogs=blogs, owner=owner)
 
     else: #LISTS ALL BLOG ENTRIES BY ALL USERS
         return render_template('blog.html',title="Blog",blogs=blogs)
