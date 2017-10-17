@@ -18,7 +18,7 @@
       <div class="blogpost" name="{{blog.id}}">
         <h4><a href="./blog?name={{blog.id}}">{{blog.blog_title}}</a></h4>
 
-        <p>Posted By: {{blog.user.email}}</p>
+        <p>Written By: <a href="./blog?id={{blog.user.email}}">{{blog.user.email}}</a></p>
 
         <p>{{blog.blog_text}}</p>
       </div>

@@ -4,7 +4,7 @@
 
 
 <form class="newblogpost" name='{{thisblog.id}}' id='{{thisblog.owner_id}}'>
-  <h4>{{thisblog.blog_title}}</h4>Posted by: {{thisblog.user.email}}
+  <h4>{{thisblog.blog_title}}</h4>Written By: <a href="./blog?id={{thisblog.user.email}}">{{thisblog.user.email}}</a>
 
   <p>{{thisblog.blog_text}}</p>
 </form>
