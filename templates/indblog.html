@@ -3,13 +3,14 @@
 {% block content %}
 
 
-<div class="newblogpost" name='{{thisblog.id}}'>
-  <h4>{{thisblog.blog_title}}</h4>
+<form class="newblogpost" name='{{thisblog.id}}' id='{{thisblog.owner_id}}'>
+  <h4>{{thisblog.blog_title}}</h4>Posted by: {{thisblog.user.email}}
+
   <p>{{thisblog.blog_text}}</p>
-  <form action="/delete-blog" method='POST'>
-    <input type="submit" value="Delete This Blog Entry">
-  </form>
-</div>
+</form>
+<form action="/deleteblog" method='POST'>
+  <input type="submit" value="Delete This Blog Entry">
+</form>
 
 {% with messages = get_flashed_messages(with_categories=True) %}
 <ul>

@@ -1,5 +1,6 @@
 from flask import Flask, request, redirect, render_template, session, flash
 from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
 #pylint: disable=no-member
 
 app = Flask(__name__)
@@ -15,13 +16,13 @@ class Blog(db.Model):
     blog_title = db.Column(db.String(60))
     blog_text = db.Column(db.String(1000))
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user = db.relationship('User')
 
     def __init__(self, blog_title, blog_text, owner):
         self.blog_title = blog_title
         self.blog_text = blog_text
         self.owner = owner
 
-#THIS IS THE USER FROM GET-IT-DONE; ADDED 10/12
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(40), unique=True)
@@ -32,14 +33,12 @@ class User(db.Model):
         self.email = email
         self.password = password
 
-#THIS IS THE USER-VERIFICATION FROM GET-IT-DONE; ADDED 10/12
 @app.before_request
 def require_login():
-  allowed_routs = ['login', 'register']
+  allowed_routs = ['login', 'register', 'blog', 'index']
   if request.endpoint not in allowed_routs and 'email' not in session:
     return redirect('/login')
 
-#THIS IS THE LOGIN FROM GET-IT-DONE; ADDED 10/12
 @app.route('/login', methods=['POST', 'GET'])
 def login():
     if request.method == 'POST':
@@ -55,7 +54,6 @@ def login():
 
     return render_template('login.html', title="Account Login")
 
-#THIS IS THE REGISTER FROM GET-IT-DONE; ADDED 10/12
 @app.route('/register', methods=['POST', 'GET'])
 def register():
     if request.method == 'POST':
@@ -63,9 +61,8 @@ def register():
         password = request.form['password']
         verify = request.form['verify']
 
-        #TODO - validate user's entered DATA - ADDED 10/10/17 - FLASH ERRORS, KEEPS EMAIL
         if len(password) <= 2 or len(password) >= 21 or ' ' in password:
-            flash('Password must be at least eight (3) characters long and CANNOT contain spaces.', 'error')
+            flash('Password must be at least three (3) characters long and CANNOT contain spaces.', 'error')
             return render_template('register.html', email=email)
 
         if password != verify:
@@ -79,31 +76,28 @@ def register():
             db.session.add(new_user)
             db.session.commit()
             session['email'] = email
-            return redirect('/')
+            return redirect('/newpost')
         else:
             flash('User name already exists', 'error')
             return redirect('/login')
 
     return render_template('register.html', title="Register New Account")
 
-#LOGOUT FROM GET-IT-DONE 10-12
 @app.route('/logout')
 def logout():
     del session['email']
-    return redirect('/')
+    return redirect('/blog')
 
 @app.route('/newpost', methods=['POST', 'GET'])
 def make_newpost():
     return render_template('newpost.html', title="Create New Post")
 
-#USER SUBMIT NEW POST
 @app.route('/submitnew', methods=['POST', 'GET'])
 def submitnew():
     blog_title = request.form['blog_title']
     blog_text = request.form['blog_text']
     blogs = Blog.query.all()
     owner = User.query.filter_by(email=session['email']).first()
-    email = request.args.get('email')
 
     if blog_title == '':
         flash("Title required to post!", 'error')
@@ -125,18 +119,25 @@ def submitnew():
 @app.route('/blog', methods=['POST', 'GET'])
 def blog():
     blog_id = request.args.get('name')
+    theuser = request.args.get('id')
+    blogs = Blog.query.all()
+
     if blog_id:
         thisblog = Blog.query.get(blog_id)
         return render_template('indblog.html',title=thisblog.blog_title,thisblog=thisblog)
-    else:
-        blogs = Blog.query.all()
+
+    if theuser: #FOR SHOWING LIST OF ONE USER'S BLOG ENTRIES
+        user = User.query.filter_by(email=theuser).all()
+        return render_template('userblog.html',user=user,blogs=blogs)
+
+    else: #LISTS ALL BLOG ENTRIES BY ALL USERS
         return render_template('blog.html',title="Blog",blogs=blogs)
 
 @app.route('/', methods=['POST', 'GET'])
 def index():
-    return render_template('base.html',title="Build-a-Blog")
+    users = User.query.all()
+    return render_template('index.html', users=users)
 
-#THIS WILL BE FOR CALLING THE USER'S BLOG POSTS ONLY
 @app.route('/userblog', methods=['POST', 'GET'])
 def user_index():
     owner = User.query.filter_by(email=session['email']).first()
@@ -144,17 +145,27 @@ def user_index():
 
     return render_template('blog.html',title="My Blogs", blogs=blogs, owner=owner)
 
+#THIS WILL RENDER A PAGE OF ALL CONTRIBUTERS, THEIR NAME/EMAIL WILL LINK TO THEIR HOME PAGE
+@app.route('/users', methods=['POST', 'GET'])
+
+
 #DELETE ENTRY (TASK) FROM GET-IT-DONE 10-12
-@app.route('/delete-blog', methods=['POST'])
+#DELETING ENTRY FAILS ALL CHECKS - WILL NOT DELETE; WILL NOT REROUTE/RENDER, ETC
+@app.route('/deleteblog', methods=['POST', 'GET'])
 def delete_blog():
+    thisblog = Blog.query.get(blog_id)
+    blogs = Blog.query.all()
+    owner = User.query.filter_by(email=session['email']).first()
+
     if Blog.owner_id == User.id:
-        blog_id = int(request.form['blog_id'])
-        blog = Blog.query.get(blog_id)
+        #thisblog = Blog.query.get(Blog.id)
         db.session.add(blog)
         db.session.commit()
+        flash("Blog Entry Deleted!", 'error')
     else:
-      flash("You do not have permission to DELETE this blog", 'error')
-      return redirect('/blog')
+      flash("You do not have permission to DELETE that blog", 'error')
+      
+    return render_template('blog.html', blogs=blogs, owner=owner)
 
 if __name__ == '__main__':
     app.run()

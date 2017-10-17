@@ -2,6 +2,14 @@
 
 {% block content %}
 
+{% with messages = get_flashed_messages(with_categories=True) %}
+<ul>
+  {% for category,message in messages %}
+    <li class="{{category}}">{{message}}</li>
+  {% endfor %}
+</ul>
+{% endwith %}
+
   {% if blogs|length == 0 %}
   <p>This is a boring, empty blog...</p>
   {% else %}
@@ -9,6 +17,9 @@
     {% for blog in blogs %}
       <div class="blogpost" name="{{blog.id}}">
         <h4><a href="./blog?name={{blog.id}}">{{blog.blog_title}}</a></h4>
+
+        <p>Posted By: {{blog.user.email}}</p>
+
         <p>{{blog.blog_text}}</p>
       </div>
     {% endfor %}

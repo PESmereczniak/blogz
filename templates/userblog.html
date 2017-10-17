@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% for blog in blogs %}
+  {% if user == blog.user.email %}
+    <form class="blogpost" name='{{blog.id}}' id='{{blog.owner_id}}'>
+      <h4>{{blog.blog_title}}</h4>Posted by: {{blog.user.email}}
+
+      <p>{{blog.blog_text}}</p>
+    </form>
+    <form action="/deleteblog" method='POST'>
+      <input type="submit" value="Delete This Blog Entry">
+    </form>
+  {% endif %}
+{% endfor %}
+
+{% with messages = get_flashed_messages(with_categories=True) %}
+<ul>
+  {% for category,message in messages %}
+    <li class="{{category}}">{{message}}</li>
+  {% endfor %}
+</ul>
+{% endwith %}
+
+{% endblock %}

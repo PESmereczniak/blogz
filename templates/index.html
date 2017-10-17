@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% with messages = get_flashed_messages(with_categories=True) %}
+<ul>
+  {% for category,message in messages %}
+    <li class="{{category}}">{{message}}</li>
+  {% endfor %}
+</ul>
+{% endwith %}
+
+{% for user in users %}
+<div class="userslisted" name="{{user.email}}" id="{{user.email}}">
+  <h4><a href="./blog?id={{user.email}}">{{user.email}}'s Blog</a></h4></br>
+</div>
+{% endfor %}
+
+{% endblock %}
