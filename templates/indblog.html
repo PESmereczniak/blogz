@@ -3,7 +3,7 @@
 {% block content %}
 
 
-<form class="newblogpost" name='{{thisblog.id}}' id='{{thisblog.owner_id}}'>
+<form class="newblogpost" name='{{thisblog.id}}' id='{{thisblog.user.email}}'>
   <h4>{{thisblog.blog_title}}</h4>Written By: <a href="./blog?id={{thisblog.user.email}}">{{thisblog.user.email}}</a>
 
   <p>{{thisblog.blog_text}}</p>

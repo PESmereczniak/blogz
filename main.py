@@ -48,7 +48,7 @@ def login():
         if user and user.password == password:
             session['email'] = email
             flash("Logged In")
-            return redirect('/userblog')
+            return redirect('/')
         else:
             flash('User password incorrect, or user does not exist', 'error')
 
@@ -147,23 +147,24 @@ def user_index():
 
     return render_template('blog.html',title="My Blogs", blogs=blogs, owner=owner)
 
-#DELETE ENTRY (TASK) FROM GET-IT-DONE 10-12
-#DELETING ENTRY FAILS ALL CHECKS - WILL NOT DELETE; WILL NOT REROUTE/RENDER, ETC
+#DELETING ENTRY FAILS ALL CHECKS - WILL NOT DELETE; DOES RETURN 'NO PERMISSION' BUT FOR EVERY ATTEMPT
+#Stupid delete_blog() doesn't work, but isn't needed for the project... I'll deal with this later. :-/
 @app.route('/deleteblog', methods=['POST', 'GET'])
 def delete_blog():
-    thisblog = Blog.query.get(blog_id)
-    blogs = Blog.query.all()
-    owner = User.query.filter_by(email=session['email']).first()
+    blog_id = request.args.get('name') #name IS THE BLOG id
+    delblog = Blog.query.filter_by(id = blog_id).first() #GETS INDIVIDUAL BLOG ENTRY FROM Blog
+    blogowner = request.args.get('id') #id IS THE EMAIL OF THE OWNER/CREATOR ON BLOG
+    owner = User.query.filter_by(email = blogowner).first() #THIS SHOULD BE EMAIL OF OWNER/CREATOR
+    currentuser = User.query.filter_by(email=session['email']).first() #EMAIL OF CURRENT USER
 
-    if Blog.owner_id == User.id:
-        #thisblog = Blog.query.get(Blog.id)
-        db.session.add(blog)
+    if currentuser.id == owner.id:
+        db.session.delete(delblog)
         db.session.commit()
         flash("Blog Entry Deleted!", 'error')
     else:
-      flash("You do not have permission to DELETE that blog", 'error')
-      
-    return render_template('blog.html', blogs=blogs, owner=owner)
+        flash("You do not have permission to DELETE that blog", 'error')
+
+    return redirect('/userblog') #redirect TO USERBLOG WITH ERROR *WORKS*
 
 if __name__ == '__main__':
     app.run()
