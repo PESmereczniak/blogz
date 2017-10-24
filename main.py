@@ -111,9 +111,8 @@ def submitnew():
         newpost = Blog(blog_title, blog_text, owner)
         db.session.add(newpost)
         db.session.commit()
-
-    thisblog = newpost
-    return render_template('indblog.html',title=thisblog.blog_title,thisblog=thisblog)
+        thisblog = str(newpost.id)
+        return redirect('/blog?name='+thisblog)
 
 #THIS CALLS ALL BLOG ENTRIES FROM ALL USERS
 @app.route('/blog', methods=['POST', 'GET'])
